@@ -1,0 +1,6 @@
+export { default as DataPanel } from './DataPanel.vue'
+export { default as AccountPanel } from './AccountPanel.vue'
+export { default as ExternalChannelPanel } from './ExternalChannelPanel.vue'
+export { default as PluginDownloadPanel } from './PluginDownloadPanel.vue'
+export { default as PersonalSettingsPanel } from './PersonalSettingsPanel.vue'
+export { default as MonitorPanel } from './MonitorPanel.vue'

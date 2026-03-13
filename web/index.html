@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Augment Gateway 管理界面</title>
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <!-- Inter + Noto Sans SC 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // 在页面渲染前立即应用暗黑模式，避免闪烁
+    (function() {
+      var themeMode = localStorage.getItem('themeMode') || 'system';
+      var shouldBeDark = false;
+      if (themeMode === 'dark') {
+        shouldBeDark = true;
+      } else if (themeMode === 'system') {
+        shouldBeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } else if (!localStorage.getItem('themeMode') && localStorage.getItem('darkMode') === 'true') {
+        // 兼容旧版 darkMode 存储
+        shouldBeDark = true;
+      }
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  <style>
+    /* 暗黑模式下的初始背景色，防止白色闪烁 */
+    :root.dark-mode {
+      background-color: oklch(0.141 0.005 285.823);
+    }
+    :root.dark-mode body {
+      background-color: oklch(0.141 0.005 285.823);
+    }
+    /* 暗黑模式下 Element Plus 表格初始样式 */
+    :root.dark-mode .el-table,
+    :root.dark-mode .el-table__inner-wrapper,
+    :root.dark-mode .el-table__body-wrapper,
+    :root.dark-mode .el-table__header-wrapper {
+      background-color: transparent !important;
+    }
+    :root.dark-mode .el-table tr,
+    :root.dark-mode .el-table th.el-table__cell,
+    :root.dark-mode .el-table td.el-table__cell {
+      background-color: transparent !important;
+    }
+    /* 暗黑模式下内容卡片初始样式 */
+    :root.dark-mode .content-card {
+      background: oklch(0.21 0.006 285.885);
+      border-color: oklch(1 0 0 / 10%);
+    }
+    /* 暗黑模式下 Element Plus 加载遮罩 */
+    :root.dark-mode .el-loading-mask {
+      background-color: rgba(30, 30, 34, 0.9) !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: augment-gateway-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-your_root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-augment_gateway}
+      MYSQL_USER: ${MYSQL_USER:-augment}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-your_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - augment-network
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: augment-gateway-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - augment-network
+
+  # 应用主服务
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: augment-augment
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      # 服务器配置
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 28080
+      GIN_MODE: release
+
+      # 数据库配置
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-augment}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-your_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-augment_gateway}
+      MYSQL_MAX_IDLE_CONNS: 10
+      MYSQL_MAX_OPEN_CONNS: 100
+      MYSQL_CONN_MAX_LIFETIME: 3600
+
+      # Redis配置
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_DB: 0
+
+      # 代理配置
+      PROXY_TIMEOUT: 1800
+      PROXY_KEEP_ALIVE: 300
+      PROXY_MAX_IDLE_CONNS: 100
+      PROXY_MAX_IDLE_CONNS_PER_HOST: 10
+      PROXY_RESPONSE_HEADER_TIMEOUT: 60
+      PROXY_EXPECT_CONTINUE_TIMEOUT: 1
+      PROXY_MAX_RESPONSE_HEADER_BYTES: 1048576
+      PROXY_WRITE_BUFFER_SIZE: 4096
+      PROXY_READ_BUFFER_SIZE: 4096
+      PROXY_IDLE_CONN_TIMEOUT: 300
+      PROXY_TLS_HANDSHAKE_TIMEOUT: 10
+
+      # Token配置
+      TOKEN_CACHE_TTL: 3600
+
+      # 统计配置
+      STATS_ENABLED: true
+      STATS_BUFFER_SIZE: 1000
+      STATS_FLUSH_INTERVAL: 300
+      STATS_CLEANUP_INTERVAL: 3600
+      STATS_RETENTION_DAYS: 30
+
+      # 日志配置
+      LOG_LEVEL: info
+      LOG_FORMAT: json
+      LOG_CALLER: false
+      LOG_STACK_TRACE: false
+      LOG_FILE_ENABLED: true
+      LOG_FILE_PATH: /app/logs/app.log
+      LOG_FILE_MAX_SIZE: 100
+      LOG_FILE_MAX_BACKUPS: 10
+      LOG_FILE_MAX_AGE: 30
+      LOG_FILE_COMPRESS: true
+
+      # 监控配置
+      METRICS_ENABLED: true
+      METRICS_PATH: /metrics
+      PPROF_ENABLED: false
+      PPROF_PATH: /debug/pprof
+
+      # 安全配置
+      CORS_ENABLED: true
+      CORS_ALLOW_ORIGINS: "*"
+      CORS_ALLOW_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+      CORS_ALLOW_HEADERS: "Content-Type,Authorization,X-Requested-With"
+      CORS_EXPOSE_HEADERS: "Content-Length,Content-Type"
+      CORS_ALLOW_CREDENTIALS: true
+      CORS_MAX_AGE: 86400
+
+      # 前端配置
+      FRONTEND_ENABLED: true
+      FRONTEND_STATIC_PATH: /app/web/dist
+      FRONTEND_PATH: /app/web/dist
+      FRONTEND_INDEX: index.html
+      FRONTEND_FALLBACK: true
+      FRONTEND_URL: ${FRONTEND_URL:-}
+
+      # JWT配置
+      JWT_SECRET: ${JWT_SECRET:-change-me-to-a-random-secret}
+      JWT_EXPIRES_IN: 86400
+      JWT_REFRESH_EXPIRES_IN: 604800
+
+      # 默认管理员配置
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+
+    ports:
+      - "28080:28080"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - augment-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  augment-network:
+    driver: bridge
