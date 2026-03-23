@@ -3,10 +3,7 @@
 [中文](./README.md) | English
 
 > [!WARNING]
-> This project was built with 90% AI + 10% human effort. It is for technical research purposes only. No issues will be accepted. Feel free to fork / modify. For commercial use, please credit the original source.
-
-> [!NOTE]
-> **From the author:** I disagree with AugmentCode's business philosophy and technical direction. The company is arrogant toward its users, dismissive of their needs, and lacks any sense of contractual integrity. Their product is shipped without proper testing, and the recently launched "Intent" feature is nothing but garbage. Its best outcome would be getting acquired and sidelined, or simply going out of business. I hope Augment's product team and leadership realize that your ACE is no longer your moat — shut down the company and go enjoy life with the money!
+> The business logic of this project was completed with 90% AI + 10% human effort. The plugin integration and interface debugging were all completed by humans. It is for technical research purposes only. Feel free to fork / modify. For commercial use, please credit the original source. Please use this project with [AugmentCode patch project](https://github.com/linqiu919/augment-open-patch) for better results.
 
 > AugmentCode API proxy gateway built with Go and Vue.js
 
